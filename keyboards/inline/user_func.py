@@ -1,12 +1,15 @@
 # - *- coding: utf- 8 - *-
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+from ..default.builder import InlineKeyboardBuilder
+
 # Проверка оплаты битка
 def create_pay_qiwi_func(send_requests, receipt, message_id, way):
-    check_qiwi_pay_inl = InlineKeyboardMarkup()
+    check_qiwi_pay_inl = InlineKeyboardBuilder()
     check_qiwi_pay_inl.add(InlineKeyboardButton(text="🌀 Перейти к оплате", url=send_requests))
     check_qiwi_pay_inl.add(InlineKeyboardButton(text="🔄 Проверить оплату",
                                                 callback_data=f"Pay:{way}:{receipt}:{message_id}"))
+    check_qiwi_pay_inl.row("⬅ На главную")
     return check_qiwi_pay_inl
 
 

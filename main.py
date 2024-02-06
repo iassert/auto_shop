@@ -9,21 +9,21 @@ async def on_startup(dp):
     filters.setup(dp)
     middlewares.setup(dp)
 
-    from utils.crypto_bot import Executor
-    from utils.other_func import on_startup_notify, update_last_profit, check_update_bot, update_profit
+    from utils.crypto_bot       import Executor
+    from utils.other_func       import on_startup_notify, update_last_profit, check_update_bot, update_profit
     from utils.set_bot_commands import set_default_commands
-    from utils.db_api.sqlite import create_bdx
+    from utils.db_api.sqlite    import create_bdx
 
     from data.config import ctypro_bot_token
 
     from aiocryptopay import Networks
-    
+
     await set_default_commands(dp)
     await on_startup_notify(dp)
     await create_bdx()
     await update_profit()
 
-    ex = Executor(ctypro_bot_token)
+    ex = Executor(ctypro_bot_token, Networks.TEST_NET)
     ex.start_polling()
 
     print("~~~~~ Bot was started ~~~~~")

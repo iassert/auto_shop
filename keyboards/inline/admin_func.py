@@ -1,6 +1,8 @@
 # - *- coding: utf- 8 - *-
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+from ..default.builder import InlineKeyboardBuilder
+
 from keyboards.inline.callback_datas import *
 from utils.db_api.sqlite import get_paymentx, get_positionx, get_itemsx, get_positionsx, get_categoryx
 
@@ -21,28 +23,33 @@ def give_contest_func(user_id):
 
 # Поиск профиля
 def search_profile_func(user_id):
-    search_profile = InlineKeyboardMarkup()
-    user_purchases_kb = InlineKeyboardButton(text="🛒 Покупки",
-                                             callback_data=user_purchases_cd.new(
-                                                 user_id=user_id))
-    add_balance_kb = InlineKeyboardButton(text="💴 Выдать баланс",
-                                          callback_data=user_add_balance_cd.new(
-                                              user_id=user_id))
-    set_balance_kb = InlineKeyboardButton(text="💸 Изменить баланс",
-                                          callback_data=user_set_balance_cd.new(
-                                              user_id=user_id))
-    send_msg_kb = InlineKeyboardButton(text="💌 Отправить СМС",
-                                       callback_data=user_send_message_cd.new(
-                                           user_id=user_id))
+    search_profile = InlineKeyboardBuilder()
+    user_purchases_kb = InlineKeyboardButton(
+        text="🛒 Покупки",
+        callback_data=user_purchases_cd.new(user_id=user_id)
+    )
+    add_balance_kb = InlineKeyboardButton(
+        text="💴 Выдать баланс",
+        callback_data=user_add_balance_cd.new(user_id=user_id)
+    )
+    set_balance_kb = InlineKeyboardButton(
+        text="💸 Изменить баланс",
+        callback_data=user_set_balance_cd.new(user_id=user_id)
+    )
+    send_msg_kb = InlineKeyboardButton(
+        text="💌 Отправить СМС",
+        callback_data=user_send_message_cd.new(user_id=user_id)
+    )
     search_profile.add(add_balance_kb, set_balance_kb)
     search_profile.add(user_purchases_kb, send_msg_kb)
+    search_profile.row("⬅ На главную")
     return search_profile
 
 
 # Способы пополнения
 async def choice_way_input_payment_func():
     get_payments = await get_paymentx()
-    payment_method = InlineKeyboardMarkup()
+    payment_method = InlineKeyboardBuilder()
 
     if get_payments[4] == "form":
         change_qiwi_form = InlineKeyboardButton(text="✅ По форме", callback_data="...")
@@ -61,6 +68,7 @@ async def choice_way_input_payment_func():
 
     payment_method.add(change_qiwi_form, change_qiwi_number)
     payment_method.add(change_qiwi_nickname)
+    payment_method.row("⬅ На главную")
     return payment_method
 
 
@@ -88,12 +96,14 @@ async def edit_category_func(category_id, remover):
 
 # Кнопки с удалением категории
 def confirm_remove_func(category_id, remover):
-    confirm_remove_keyboard = InlineKeyboardMarkup()
+    confirm_remove_keyboard = InlineKeyboardBuilder()
     change_name_kb = InlineKeyboardButton(text="❌ Да, удалить",
                                           callback_data=f"yes_remove_category:{category_id}:{remover}")
     move_kb = InlineKeyboardButton(text="✅ Нет, отменить",
                                    callback_data=f"not_remove_category:{category_id}:{remover}")
     confirm_remove_keyboard.add(change_name_kb, move_kb)
+    confirm_remove_keyboard.row("⬅ На главную")
+
     return confirm_remove_keyboard
 
 
@@ -135,10 +145,11 @@ async def open_edit_position_func(position_id, category_id, remover):
 
 # Подтверждение удаления позиции
 def confirm_remove_position_func(position_id, category_id, remover):
-    confirm_remove_position_keyboard = InlineKeyboardMarkup()
+    confirm_remove_position_keyboard = InlineKeyboardBuilder()
     change_name_kb = InlineKeyboardButton(text="❌ Да, удалить",
                                           callback_data=f"yes_remove_position:{position_id}:{category_id}:{remover}")
     move_kb = InlineKeyboardButton(text="✅ Нет, отменить",
                                    callback_data=f"not_remove_position:{position_id}:{category_id}:{remover}")
     confirm_remove_position_keyboard.add(change_name_kb, move_kb)
+    confirm_remove_position_keyboard.row("⬅ На главную")
     return confirm_remove_position_keyboard

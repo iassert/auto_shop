@@ -321,7 +321,7 @@ async def remove_positionx(**kwargs):
 async def add_itemx(category_id, position_id, get_all_items, user_name, user_id):
     async with aiosqlite.connect(path_to_db) as db:
         for item_data in get_all_items:
-            if not item_data.isspace() and item_data is not "":
+            if not item_data.isspace() and item_data != "":
                 item_id = [random.randint(100000, 999999)]
                 await db.execute("INSERT INTO storage_item "
                                  "(item_id, item_data, position_id, category_id, creator_id, creator_name, add_date) "
@@ -449,18 +449,23 @@ async def get_all_purchasesx():
 
 async def get_all_invoice():
     async with aiosqlite.connect(path_to_db) as db:
-        sql = "SELECT invoice_id FROM invoices"
+        sql = "SELECT invoice_id, user_id, username, first_name FROM invoices;"
         get_response = await db.execute(sql)
         get_response = await get_response.fetchall()
     return get_response
 
-async def add_invoice(invoice_id: int):
+async def add_invoice(
+    invoice_id: int, 
+    user_id:    int, 
+    username:   str | None, 
+    first_name: str
+):
     async with aiosqlite.connect(path_to_db) as db:
         await db.execute(
             "INSERT INTO invoices "
-            "(invoice_id)"
-            "VALUES (?)",
-            [invoice_id]
+            "(invoice_id, user_id, username, first_name)"
+            "VALUES (?, ?, ?, ?)",
+            [invoice_id, user_id, username, first_name]
         )
         await db.commit()
 
@@ -622,9 +627,19 @@ async def create_bdx():
         check_sql = await check_sql.fetchall()
         check_create_purchases = [c for c in check_sql]
         if len(check_create_purchases) == 1:
+            await db.execute("DROP TABLE invoices;")
+            await db.commit()
+            print("DB invoices drop(9/9)")
+        if len(check_create_purchases) == 4:
             print("DB was found(9/9)")
         else:
-            await db.execute("CREATE TABLE invoices("
-                             "invoice_id INTEGER)")
+            await db.execute(
+                "CREATE TABLE invoices("
+                    "invoice_id INTEGER PRIMARY KEY,"
+                    "user_id    INTEGER NOT NULL,"
+                    "username   TEXT,"
+                    "first_name TEXT    NOT NULL"
+                ")"
+            )
             print("DB was not found(9/9) | Creating...")
         await db.commit()

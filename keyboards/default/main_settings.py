@@ -1,12 +1,12 @@
 # - *- coding: utf- 8 - *-
-from aiogram.types import ReplyKeyboardMarkup
+from .builder import InlineKeyboardBuilder
 
 from utils.db_api.sqlite import get_settingsx
 
 
 async def get_settings_func():
     get_settings = await get_settingsx()
-    settings_default = ReplyKeyboardMarkup(resize_keyboard=True)
+    settings_default = InlineKeyboardBuilder(resize_keyboard=True)
     if get_settings[3] == "True":
         status_buy = "🔴 Выключить покупки"
     elif get_settings[3] == "False":
@@ -21,5 +21,5 @@ async def get_settings_func():
     return settings_default
 
 
-settings_back_default = ReplyKeyboardMarkup(resize_keyboard=True)
+settings_back_default = InlineKeyboardBuilder(resize_keyboard=True)
 settings_back_default.row("⚙ К настройкам ↩")

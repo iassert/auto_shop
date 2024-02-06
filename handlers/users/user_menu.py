@@ -19,80 +19,88 @@ def split_messages(get_list, count):
 
 
 # Обработка кнопки "Купить"
-@dp.message_handler(IsPrivate(), text="🎁 Купить", state="*")
-async def show_search(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text="🎁 Купить", state="*")
+async def show_search(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     await state.finish()
     get_settings = await get_settingsx()
-    get_user = await get_user_profile(message.from_user.id)
-    if get_settings[2] == "True" or str(message.from_user.id) in admins:
+    get_user = await get_user_profile(call.from_user.id)
+    if get_settings[2] == "True" or str(call.from_user.id) in admins:
         if get_user is not None:
-            if get_settings[3] == "True" or str(message.from_user.id) in admins:
+            if get_settings[3] == "True" or str(call.from_user.id) in admins:
                 get_categories = await get_all_categoriesx()
                 if len(get_categories) >= 1:
                     get_kb = await buy_item_open_category_ap(0)
-                    await message.answer("<b>🎁 Выберите нужный вам товар:</b>", reply_markup=get_kb)
+                    await message.edit_text("<b>🎁 Выберите нужный вам товар:</b>", reply_markup=get_kb)
                 else:
-                    await message.answer("<b>🎁 Товары в данное время отсутствуют.</b>")
+                    await message.edit_text("<b>🎁 Товары в данное время отсутствуют.</b>", reply_markup=on_main)
             else:
-                await message.answer("<b>🔴 Покупки в боте временно отключены.</b>")
+                await message.edit_text("<b>🔴 Покупки в боте временно отключены.</b>", reply_markup=on_main)
         else:
-            await message.answer("<b>❗ Ваш профиль не был найден.</b>\n▶ Введите /start")
+            await message.edit_text("<b>❗ Ваш профиль не был найден.</b>\n▶ Введите /start", reply_markup=on_main)
     else:
-        await message.answer("<b>🔴 Бот находится на технических работах.</b>")
+        await message.edit_text("<b>🔴 Бот находится на технических работах.</b>", reply_markup=on_main)
 
 
 # Обработка кнопки "Профиль"
-@dp.message_handler(IsPrivate(), text="📱 Профиль", state="*")
-async def show_profile(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text="📱 Профиль", state="*")
+async def show_profile(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     await state.finish()
     get_settings = await get_settingsx()
-    get_status_user = await get_user_profile(message.from_user.id)
-    if get_settings[2] == "True" or str(message.from_user.id) in admins:
+    get_status_user = await get_user_profile(call.from_user.id)
+    if get_settings[2] == "True" or str(call.from_user.id) in admins:
         if get_status_user is not None:
-            await message.answer(get_status_user, reply_markup=open_profile_inl)
+            await message.edit_text(get_status_user, reply_markup=open_profile_inl)
         else:
-            await message.answer("<b>❗ Ваш профиль не был найден.</b>\n▶ Введите /start")
+            await message.edit_text("<b>❗ Ваш профиль не был найден.</b>\n▶ Введите /start", reply_markup=on_main)
     else:
-        await message.answer("<b>🔴 Бот находится на технических работах.</b>")
+        await message.edit_text("<b>🔴 Бот находится на технических работах.</b>", reply_markup=on_main)
 
 
 # Обработка кнопки "FAQ"
-@dp.message_handler(IsPrivate(), text="ℹ FAQ", state="*")
-async def show_my_deals(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text="ℹ FAQ", state="*")
+async def show_my_deals(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     await state.finish()
     get_settings = await get_settingsx()
-    get_status_user = await get_userx(user_id=message.from_user.id)
-    if get_settings[2] == "True" or str(message.from_user.id) in admins:
+    get_status_user = await get_userx(user_id=call.from_user.id)
+    if get_settings[2] == "True" or str(call.from_user.id) in admins:
         if get_status_user is not None:
             get_settings = await get_settingsx()
             send_msg = get_settings[1]
             if "{username}" in send_msg:
-                send_msg = send_msg.replace("{username}", f"<b>{message.from_user.username}</b>")
+                send_msg = send_msg.replace("{username}", f"<b>{call.from_user.username}</b>")
             if "{user_id}" in send_msg:
-                send_msg = send_msg.replace("{user_id}", f"<b>{message.from_user.id}</b>")
+                send_msg = send_msg.replace("{user_id}", f"<b>{call.from_user.id}</b>")
             if "{firstname}" in send_msg:
-                send_msg = send_msg.replace("{firstname}", f"<b>{clear_firstname(message.from_user.first_name)}</b>")
-            await message.answer(send_msg, disable_web_page_preview=True)
+                send_msg = send_msg.replace("{firstname}", f"<b>{clear_firstname(call.from_user.first_name)}</b>")
+            await message.edit_text(send_msg, disable_web_page_preview=True, reply_markup=on_main)
         else:
-            await message.answer("<b>❗ Ваш профиль не был найден.</b>\n▶ Введите /start")
+            await message.edit_text("<b>❗ Ваш профиль не был найден.</b>\n▶ Введите /start", reply_markup=on_main)
     else:
-        await message.answer("<b>🔴 Бот находится на технических работах.</b>")
+        await message.edit_text("<b>🔴 Бот находится на технических работах.</b>", reply_markup=on_main)
 
 
 # Обработка кнопки "Поддержка"
-@dp.message_handler(IsPrivate(), text="📕 Поддержка", state="*")
-async def show_contact(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text="📕 Поддержка", state="*")
+async def show_contact(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     await state.finish()
     get_settings = await get_settingsx()
-    get_status_user = await get_userx(user_id=message.from_user.id)
-    if get_settings[2] == "True" or str(message.from_user.id) in admins:
+    get_status_user = await get_userx(user_id=call.from_user.id)
+    if get_settings[2] == "True" or str(call.from_user.id) in admins:
         if get_status_user is not None:
             get_status_user = await get_settingsx()
-            await message.answer(get_status_user[0], disable_web_page_preview=True)
+            await message.edit_text(get_status_user[0], disable_web_page_preview=True, reply_markup=on_main)
         else:
-            await message.answer("<b>❗ Ваш профиль не был найден.</b>\n▶ Введите /start")
+            await message.edit_text("<b>❗ Ваш профиль не был найден.</b>\n▶ Введите /start", reply_markup=on_main)
     else:
-        await message.answer("<b>🔴 Бот находится на технических работах.</b>")
+        await message.edit_text("<b>🔴 Бот находится на технических работах.</b>", reply_markup=on_main)
 
 
 # Обработка колбэка "Мои покупки"

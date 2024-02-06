@@ -12,7 +12,6 @@ from keyboards.default import items_back_default, items_default, skip_send_image
 from keyboards.inline import *
 from keyboards.inline.inline_page import *
 from loader import dp, bot
-from middlewares.throttling import rate_limit
 from states.state_items import StoragePosition, StorageCategory, StorageItems
 from utils.other_func import clear_firstname
 
@@ -20,10 +19,12 @@ from utils.other_func import clear_firstname
 ################################################################################################
 ####################################### СОЗДАНИЕ КАТЕГОРИЙ #####################################
 # Создание новой категории
-@dp.message_handler(IsPrivate(), IsAdmin(), text="📜 Создать категорию ➕", state="*")
-async def category_create_new(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text="📜 Создать категорию ➕", state="*")
+async def category_create_new(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     await StorageCategory.here_input_category_name.set()
-    await message.answer("<b>📜 Введите название для категории 🏷</b>",
+    await message.edit_text("<b>📜 Введите название для категории 🏷</b>",
                          reply_markup=items_back_default)
 
 
@@ -40,14 +41,16 @@ async def category_create_input_name(message: types.Message, state: FSMContext):
 ################################################################################################
 ####################################### ИЗМЕНЕНИЕ КАТЕГОРИЙ ####################################
 # Открытие страниц выбора категорий для редактирования
-@dp.message_handler(IsPrivate(), IsAdmin(), text="📜 Изменить категорию 🖍", state="*")
-async def category_open_edit(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text="📜 Изменить категорию 🖍", state="*")
+async def category_open_edit(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     get_categories = await get_all_categoriesx()
     if len(get_categories) >= 1:
         get_kb = await category_open_edit_ap(0)
-        await message.answer("<b>📜 Выберите категорию для изменения 🖍</b>", reply_markup=get_kb)
+        await message.edit_text("<b>📜 Выберите категорию для изменения 🖍</b>", reply_markup=get_kb)
     else:
-        await message.answer("<b>📜 Категории отсутствуют 🖍</b>")
+        await message.edit_text("<b>📜 Категории отсутствуют 🖍</b>")
 
 
 # Сделующая страница выбора категорий для редактирования
@@ -174,9 +177,11 @@ async def category_remove_confirm(call: CallbackQuery, state: FSMContext):
 ################################################################################################
 #################################### УДАЛЕНИЕ ВСЕХ КАТЕГОРИЙ ###################################
 # Окно с уточнением удалить все категории (позиции и товары включительно)
-@dp.message_handler(IsPrivate(), IsAdmin(), text="📜 Удалить категории ❌", state="*")
-async def category_remove_all(message: types.Message, state: FSMContext):
-    await message.answer("<b>📜 Вы действительно хотите удалить все категории? ❌</b>\n"
+@dp.callback_query_handler(text="📜 Удалить категории ❌", state="*")
+async def category_remove_all(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
+    await message.edit_text("<b>📜 Вы действительно хотите удалить все категории? ❌</b>\n"
                          "❗ Так же будут удалены все позиции и товары",
                          reply_markup=confirm_clear_category_inl)
 
@@ -203,14 +208,16 @@ async def category_remove_all_cancel(call: CallbackQuery, state: FSMContext):
 ################################################################################################
 ####################################### ДОБАВЛЕНИЕ ПОЗИЦИЙ #####################################
 # Создание новой позиции
-@dp.message_handler(IsPrivate(), IsAdmin(), text="📁 Создать позицию ➕", state="*")
-async def position_create_new(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text="📁 Создать позицию ➕", state="*")
+async def position_create_new(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     get_categories = await get_all_categoriesx()
     if len(get_categories) >= 1:
         get_kb = await position_open_create_ap(0)
-        await message.answer("<b>📁 Выберите место для позиции ➕</b>", reply_markup=get_kb)
+        await message.edit_text("<b>📁 Выберите место для позиции ➕</b>", reply_markup=get_kb)
     else:
-        await message.answer("<b>❌ Отсутствуют категории для создания позиции.</b>")
+        await message.edit_text("<b>❌ Отсутствуют категории для создания позиции.</b>")
 
 
 # Сделующая страница выбора категорий для создания позиций
@@ -298,8 +305,10 @@ async def position_input_discription(message: types.Message, state: FSMContext):
 
 
 # Принятие пропуска изображения позиции для её создания
-@dp.message_handler(text="📸 Пропустить", state=StoragePosition.here_input_position_image)
-async def position_skip_get_image(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text="📸 Пропустить", state=StoragePosition.here_input_position_image)
+async def position_skip_get_image(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     async with state.proxy() as data:
         position_name = data["here_input_position_name"]
         position_price = data["here_input_position_price"]
@@ -309,7 +318,7 @@ async def position_skip_get_image(message: types.Message, state: FSMContext):
     position_id = [random.randint(100000000, 999999999)]
     await add_positionx(position_id[0], position_name, position_price, position_discription,
                         "", datetime.datetime.today().replace(microsecond=0), catategory_id)
-    await message.answer("<b>📁 Позиция была успешно создана ✅</b>",
+    await message.edit_text("<b>📁 Позиция была успешно создана ✅</b>",
                          reply_markup=items_default)
 
 
@@ -333,10 +342,13 @@ async def position_get_image(message: types.Message, state: FSMContext):
 ################################################################################################
 ####################################### ИЗМЕНЕНИЕ ПОЗИЦИЙ #####################################
 # Начальные категории для изменения позиции
-@dp.message_handler(IsPrivate(), IsAdmin(), text="📁 Изменить позицию 🖍", state="*")
-async def choice_category_for_edit_position(message: types.Message, state: FSMContext):
+
+@dp.callback_query_handler(text="📁 Изменить позицию 🖍", state="*")
+async def choice_category_for_edit_position(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     get_kb = await position_open_edit_category_ap(0)
-    await message.answer("<b>📁 Выберите категорию с нужной вам позицией 🖍</b>", reply_markup=get_kb)
+    await message.edit_text("<b>📁 Выберите категорию с нужной вам позицией 🖍</b>", reply_markup=get_kb)
 
 
 # Возвращение к начальным категориям для изменения позиции
@@ -704,9 +716,13 @@ async def open_category_for_create_position(call: CallbackQuery, state: FSMConte
 ################################################################################################
 ###################################### УДАЛЕНИЕ ВСЕХ ПОЗИЦИЙ ###################################
 # Подтверждение удаления всех позиций
-@dp.message_handler(IsPrivate(), IsAdmin(), text="📁 Удалить позиции ❌", state="*")
-async def open_create_position(message: types.Message, state: FSMContext):
-    await message.answer("<b>📜 Вы действительно хотите удалить все позиции? ❌</b>\n"
+
+
+@dp.callback_query_handler(text_startswith="📁 Удалить позиции ❌", state="*")
+async def open_create_position(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
+    await message.edit_text("<b>📜 Вы действительно хотите удалить все позиции? ❌</b>\n"
                          "❗ Так же будут удалены все товары",
                          reply_markup=confirm_clear_position_inl)
 
@@ -738,14 +754,16 @@ async def create_input_position_name(call: CallbackQuery, state: FSMContext):
 ################################################################################################
 ####################################### ДОБАВЛЕНИЕ ТОВАРОВ #####################################
 # Начальные категории для добавления товаров
-@dp.message_handler(IsPrivate(), IsAdmin(), text="🎁 Добавить товары ➕", state="*")
-async def choice_category_for_edit_position(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text_startswith="🎁 Добавить товары ➕", state="*")
+async def choice_category_for_edit_position(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     get_positions = await get_all_positionsx()
     if len(get_positions) >= 1:
         get_kb = await item_open_add_category_ap(0)
-        await message.answer("<b>🎁 Выберите категорию с нужной вам позицией ➕</b>", reply_markup=get_kb)
+        await message.edit_text("<b>🎁 Выберите категорию с нужной вам позицией ➕</b>", reply_markup=get_kb)
     else:
-        await message.answer("<b>❌ Отсутствуют позиции для добавления товара.</b>")
+        await message.edit_text("<b>❌ Отсутствуют позиции для добавления товара.</b>", reply_markup=on_main)
 
 
 # Возвращение к начальным категориям для добавления товаров
@@ -826,7 +844,7 @@ async def previous_page_for_edit_position(call: CallbackQuery, state: FSMContext
 
 
 # Выбор позиции для добавления товаров
-@rate_limit(0)
+
 @dp.callback_query_handler(text_startswith="item_add_position", state="*")
 async def open_for_edit_position(call: CallbackQuery, state: FSMContext):
     position_id = int(call.data.split(":")[1])
@@ -850,8 +868,10 @@ async def open_for_edit_position(call: CallbackQuery, state: FSMContext):
 
 
 # Завершение загрузки товаров
-@dp.message_handler(text="📥 Закончить загрузку товаров", state="*")
-async def finish_load_items(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text="📥 Закончить загрузку товаров", state="*")
+async def finish_load_items(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     get_all_items = 0
     try:
         async with state.proxy() as data:
@@ -865,14 +885,14 @@ async def finish_load_items(message: types.Message, state: FSMContext):
 
 
 # Принятие данных товара
-@rate_limit(0)
+
 @dp.message_handler(state=StorageItems.here_add_items)
 async def input_item_data(message: types.Message, state: FSMContext):
     delete_msg = await message.answer("<b>⌛ Ждите, товары добавляются...</b>")
     count_add = 0
     get_all_items = message.text.split("\n\n")
     for check_item in get_all_items:
-        if not check_item.isspace() and check_item is not "":
+        if not check_item.isspace() and check_item != "":
             count_add += 1
     async with state.proxy() as data:
         category_id = data["here_cache_add_item_category_id"]
@@ -887,13 +907,17 @@ async def input_item_data(message: types.Message, state: FSMContext):
 ################################################################################################
 ####################################### ИЗМЕНЕНИЕ ТОВАРОВ ######################################
 # Кнопка с изменением товаров
-@dp.message_handler(IsPrivate(), IsAdmin(), text="🎁 Изменить товары 🖍", state="*")
-async def open_edit_items(message: types.Message, state: FSMContext):
-    await message.answer("<b>🔹 Получение всех товаров и их позиций:</b> /getinfoitems\n"
-                         "<b>🔸 Получение всех позиций:</b> /getposition\n"
-                         "<b>🔹 Получение всех товаров:</b> /getitems\n"
-                         "<b>🔸 Получение базы данных:</b> /getbd",
-                         reply_markup=delete_item_inl)
+@dp.callback_query_handler(text="🎁 Изменить товары 🖍", state="*")
+async def open_edit_items(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+    
+    await message.edit_text(
+        "<b>🔹 Получение всех товаров и их позиций:</b> /getinfoitems\n"
+        "<b>🔸 Получение всех позиций:</b> /getposition\n"
+        "<b>🔹 Получение всех товаров:</b> /getitems\n"
+        "<b>🔸 Получение базы данных:</b> /getbd",
+        reply_markup=delete_item_inl
+    )
 
 
 # Согласие на удаление всех товаров
@@ -942,9 +966,12 @@ async def input_item_id_for_delete(message: types.Message, state: FSMContext):
 ################################################################################################
 ##################################### УДАЛЕНИЕ ВСЕХ ТОВАРОВ ####################################
 # Кнопки с подтверждением удаления всех категорий
-@dp.message_handler(IsPrivate(), IsAdmin(), text="🎁 Удалить товары ❌", state="*")
-async def open_create_category(message: types.Message, state: FSMContext):
-    await message.answer("<b>🎁 Вы действительно хотите удалить все товары?</b> ❌\n",
+
+@dp.callback_query_handler(text_startswith="🎁 Удалить товары ❌", state="*")
+async def open_create_category(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
+    await message.edit_text("<b>🎁 Вы действительно хотите удалить все товары?</b> ❌\n",
                          reply_markup=confirm_clear_item_inl)
 
 
@@ -958,7 +985,7 @@ async def confirm_clear_all_items(call: CallbackQuery, state: FSMContext):
     await clear_itemx()
     await bot.edit_message_text("<b>☑ Вы успешно удалили все товары</b>",
                                 call.from_user.id,
-                                delete_msg.message_id)
+                                delete_msg.message_id, reply_markup=on_main)
 
 
 # Отмена удаления всех товаров
@@ -966,4 +993,4 @@ async def confirm_clear_all_items(call: CallbackQuery, state: FSMContext):
 async def cancel_remove_all_items(call: CallbackQuery, state: FSMContext):
     await bot.edit_message_text("<b>☑ Вы отменили удаление всех товаров</b>",
                                 call.from_user.id,
-                                call.message.message_id)
+                                call.message.message_id, reply_markup=on_main)

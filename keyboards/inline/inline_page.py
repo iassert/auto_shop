@@ -1,7 +1,9 @@
 # - *- coding: utf- 8 - *-
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardButton
 
 from utils.db_api.sqlite import *
+
+from ..default.builder import InlineKeyboardBuilder
 
 count_page = 10
 
@@ -11,7 +13,7 @@ count_page = 10
 # Стартовые страницы выбора категории для изменения
 async def category_open_edit_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -33,13 +35,14 @@ async def category_open_edit_ap(remover):
         nomer_kb = InlineKeyboardButton(f"🔸 {str(remover + count_page)[:-1]} 🔸", callback_data="...")
         prev_kb = InlineKeyboardButton("⬅ Назад ⬅", callback_data=f"edit_catategory_prevp:{remover - count_page}")
         keyboard.add(prev_kb, nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Следующая страница выбора категории для изменения
 async def category_edit_next_page_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -55,6 +58,7 @@ async def category_edit_next_page_ap(remover):
         nomer_kb = InlineKeyboardButton(f"🔸 {str(remover + count_page)[:-1]} 🔸", callback_data="...")
         prev_kb = InlineKeyboardButton("⬅ Назад ⬅", callback_data=f"edit_catategory_prevp:{remover - count_page}")
         keyboard.add(prev_kb, nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
 
     return keyboard
 
@@ -62,7 +66,7 @@ async def category_edit_next_page_ap(remover):
 # Предыдующая страница выбора категории для изменения
 async def category_edit_prev_page_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -78,6 +82,7 @@ async def category_edit_prev_page_ap(remover):
         nomer_kb = InlineKeyboardButton(f"🔸 {str(remover + count_page)[:-1]} 🔸", callback_data="...")
         prev_kb = InlineKeyboardButton("⬅ Назад ⬅", callback_data=f"edit_catategory_prevp:{remover - count_page}")
         keyboard.add(prev_kb, nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -86,7 +91,7 @@ async def category_edit_prev_page_ap(remover):
 # Стартовые страницы выбора категории для добавления позиции
 async def position_open_create_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -99,13 +104,14 @@ async def position_open_create_ap(remover):
         nomer_kb = InlineKeyboardButton("🔸 1 🔸", callback_data="...")
         next_kb = InlineKeyboardButton("➡ Далее ➡", callback_data=f"create_position_nextp:{remover + count_page}")
         keyboard.add(nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Следующая страница выбора категории для добавления позиции
 async def position_create_next_page_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -121,13 +127,14 @@ async def position_create_next_page_ap(remover):
         nomer_kb = InlineKeyboardButton(f"🔸 {str(remover + count_page)[:-1]} 🔸", callback_data="...")
         prev_kb = InlineKeyboardButton("⬅ Назад ⬅", callback_data=f"create_position_prevp:{remover - count_page}")
         keyboard.add(prev_kb, nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Предыдующая страница выбора категории для добавления позиции
 async def position_create_previous_page_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -143,6 +150,7 @@ async def position_create_previous_page_ap(remover):
         nomer_kb = InlineKeyboardButton(f"🔸 {str(remover + count_page)[:-1]} 🔸", callback_data="...")
         prev_kb = InlineKeyboardButton("⬅ Назад ⬅", callback_data=f"create_position_prevp:{remover - count_page}")
         keyboard.add(prev_kb, nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -152,7 +160,7 @@ async def position_create_previous_page_ap(remover):
 # Стартовые страницы категорий при изменении позиции
 async def position_open_edit_category_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -178,13 +186,14 @@ async def position_open_edit_category_ap(remover):
         prev_kb = InlineKeyboardButton("⬅ Назад ⬅",
                                        callback_data=f"edit_position_category_prevp:{remover - count_page}")
         keyboard.add(prev_kb, nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Следующая страница категорий при изменении позиции
 async def position_edit_next_page_category_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -203,13 +212,14 @@ async def position_edit_next_page_category_ap(remover):
         prev_kb = InlineKeyboardButton("⬅ Назад ⬅",
                                        callback_data=f"edit_position_category_prevp:{remover - count_page}")
         keyboard.add(prev_kb, nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Предыдующая страница категорий при изменении позиции
 async def position_edit_previous_page_category_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -228,6 +238,7 @@ async def position_edit_previous_page_category_ap(remover):
         prev_kb = InlineKeyboardButton("⬅ Назад ⬅",
                                        callback_data=f"edit_position_category_prevp:{remover - count_page}")
         keyboard.add(prev_kb, nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -235,7 +246,7 @@ async def position_edit_previous_page_category_ap(remover):
 # Стартовые страницы позиций для их изменения
 async def position_open_edit_ap(remover, category_id):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_positions = await get_positionsx("*", category_id=category_id)
     for a in range(remover, len(get_positions)):
         if x < count_page:
@@ -264,13 +275,14 @@ async def position_open_edit_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_to_category"))
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Следующая страница позиций для их изменения
 async def position_edit_next_page_ap(remover, category_id):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_positions = await get_positionsx("*", category_id=category_id)
     for a in range(remover, len(get_positions)):
         if x < count_page:
@@ -292,13 +304,14 @@ async def position_edit_next_page_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_to_category"))
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Предыдующая страница позиций для их изменения
 async def position_edit_previous_page_ap(remover, category_id):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_positions = await get_positionsx("*", category_id=category_id)
     for a in range(remover, len(get_positions)):
         if x < count_page:
@@ -320,6 +333,7 @@ async def position_edit_previous_page_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_to_category"))
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -328,7 +342,7 @@ async def position_edit_previous_page_ap(remover, category_id):
 # Стартовые страницы категорий при добавлении товара
 async def item_open_add_category_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -354,13 +368,14 @@ async def item_open_add_category_ap(remover):
         prev_kb = InlineKeyboardButton("⬅ Назад ⬅",
                                        callback_data=f"add_item_category_prevp:{remover - count_page}")
         keyboard.add(prev_kb, nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Следующая страница категорий при добавлении товара
 async def item_add_next_page_category_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -379,13 +394,14 @@ async def item_add_next_page_category_ap(remover):
         prev_kb = InlineKeyboardButton("⬅ Назад ⬅",
                                        callback_data=f"add_item_category_prevp:{remover - count_page}")
         keyboard.add(prev_kb, nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Предыдующая страница категорий при добавлении товара
 async def item_add_previous_page_category_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -404,6 +420,7 @@ async def item_add_previous_page_category_ap(remover):
         prev_kb = InlineKeyboardButton("⬅ Назад ⬅",
                                        callback_data=f"add_item_category_prevp:{remover - count_page}")
         keyboard.add(prev_kb, nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -411,7 +428,7 @@ async def item_add_previous_page_category_ap(remover):
 # Стартовые страницы позиций для добавления товаров
 async def position_add_item_position_ap(remover, category_id):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_positions = await get_positionsx("*", category_id=category_id)
     for a in range(remover, len(get_positions)):
         if x < count_page:
@@ -440,13 +457,14 @@ async def position_add_item_position_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_to_category_add_item"))
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Следующая страница позиций для добавления товаров
 async def position_edit_next_page_position_ap(remover, category_id):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_positions = await get_positionsx("*", category_id=category_id)
     for a in range(remover, len(get_positions)):
         if x < count_page:
@@ -468,13 +486,14 @@ async def position_edit_next_page_position_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_to_category_add_item"))
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Предыдующая страница позиций для добавления товаров
 async def position_edit_previous_page_position_ap(remover, category_id):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_positions = await get_positionsx("*", category_id=category_id)
     for a in range(remover, len(get_positions)):
         if x < count_page:
@@ -496,6 +515,7 @@ async def position_edit_previous_page_position_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_to_category_add_item"))
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -504,7 +524,7 @@ async def position_edit_previous_page_position_ap(remover, category_id):
 # Стартовые страницы категорий при покупке товара
 async def buy_item_open_category_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -530,13 +550,14 @@ async def buy_item_open_category_ap(remover):
         prev_kb = InlineKeyboardButton("⬅ Назад ⬅",
                                        callback_data=f"buy_category_prevp:{remover - count_page}")
         keyboard.add(prev_kb, nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Следующая страница категорий при покупке товара
 async def buy_item_next_page_category_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -555,13 +576,14 @@ async def buy_item_next_page_category_ap(remover):
         prev_kb = InlineKeyboardButton("⬅ Назад ⬅",
                                        callback_data=f"buy_category_prevp:{remover - count_page}")
         keyboard.add(prev_kb, nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Предыдующая страница категорий при покупке товара
 async def buy_item_previous_page_category_ap(remover):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_categories = await get_all_categoriesx()
     for a in range(remover, len(get_categories)):
         if x < count_page:
@@ -580,6 +602,7 @@ async def buy_item_previous_page_category_ap(remover):
         prev_kb = InlineKeyboardButton("⬅ Назад ⬅",
                                        callback_data=f"buy_category_prevp:{remover - count_page}")
         keyboard.add(prev_kb, nomer_kb, next_kb)
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -587,7 +610,7 @@ async def buy_item_previous_page_category_ap(remover):
 # Стартовые страницы позиций для покупки товаров
 async def buy_item_item_position_ap(remover, category_id):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_positions = await get_positionsx("*", category_id=category_id)
     for a in range(remover, len(get_positions)):
         if x < count_page:
@@ -616,13 +639,14 @@ async def buy_item_item_position_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_buy_item_to_category"))
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Следующая страница позиций для покупки товаров
 async def item_buy_next_page_position_ap(remover, category_id):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_positions = await get_positionsx("*", category_id=category_id)
     for a in range(remover, len(get_positions)):
         if x < count_page:
@@ -644,13 +668,14 @@ async def item_buy_next_page_position_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_buy_item_to_category"))
+    keyboard.row("⬅ На главную")
     return keyboard
 
 
 # Предыдующая страница позиций для покупки товаров
 async def item_buy_previous_page_position_ap(remover, category_id):
     x = 0
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardBuilder()
     get_positions = await get_positionsx("*", category_id=category_id)
     for a in range(remover, len(get_positions)):
         if x < count_page:
@@ -672,4 +697,5 @@ async def item_buy_previous_page_position_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_buy_item_to_category"))
+    keyboard.row("⬅ На главную")
     return keyboard

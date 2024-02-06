@@ -22,17 +22,23 @@ def split_messages(get_list, count):
 
 
 # Обработка кнопки "Рассылка"
-@dp.message_handler(IsPrivate(), IsAdmin(), text="📢 Рассылка")
-async def send_ad_all_users(message: types.Message):
-    await message.answer("📢 <b>Введите текст для рассылки пользователям:</b>",
-                         reply_markup=functions_back_default)
+@dp.callback_query_handler(text="📢 Рассылка", state="*")
+async def send_ad_all_users(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
+    await message.edit_text(
+        "📢 <b>Введите текст для рассылки пользователям:</b>",
+        reply_markup=functions_back_default
+    )
     await StorageFunctions.here_ad_text.set()
 
 
 # Обработка кнопки "Поиск профиля"
-@dp.message_handler(IsPrivate(), IsAdmin(), text="📱 Поиск профиля 🔍")
-async def search_profile(message: types.Message):
-    await message.answer("📱 <b>Введите логин или айди пользователя. Пример:</b>\n"
+@dp.callback_query_handler(text="📱 Поиск профиля 🔍", state="*")
+async def search_profile(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
+    await message.edit_text("📱 <b>Введите логин или айди пользователя. Пример:</b>\n"
                          "▶ 123456789\n"
                          "▶ @example",
                          reply_markup=functions_back_default)
@@ -40,9 +46,11 @@ async def search_profile(message: types.Message):
 
 
 # Обработка кнопки "Поиск чеков"
-@dp.message_handler(IsPrivate(), IsAdmin(), text="📃 Поиск чеков 🔍")
-async def search_receipt(message: types.Message):
-    await message.answer("📃 <b>Отправьте номер чека. Пример:</b>\n"
+@dp.callback_query_handler(text="📃 Поиск чеков 🔍", state="*")
+async def search_receipt(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
+    await message.edit_text("📃 <b>Отправьте номер чека. Пример:</b>\n"
                          "▶ +123456789\n"
                          "▶ #F123456789",
                          reply_markup=functions_back_default)

@@ -20,24 +20,28 @@ from utils.db_api.sqlite import get_paymentx, update_paymentx
 ###################################################################################
 ########################### ВКЛЮЧЕНИЕ/ВЫКЛЮЧЕНИЕ ПОПОЛНЕНИЯ #######################
 # Включение пополнения
-@dp.message_handler(IsPrivate(), IsAdmin(), text="🔴 Выключить пополнения")
-async def turn_off_refill(message: types.Message):
+@dp.callback_query_handler(text="🔴 Выключить пополнения", state="*")
+async def turn_off_refill(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     await update_paymentx(status="False")
-    await message.answer("<b>🔴 Пополнения в боте были выключены.</b>",
+    await message.edit_text("<b>🔴 Пополнения в боте были выключены.</b>",
                          reply_markup=await payment_default())
     await send_all_admin(
-        f"👤 Администратор <a href='tg://user?id={message.from_user.id}'>{clear_firstname(message.from_user.first_name)}</a>\n"
+        f"👤 Администратор <a href='tg://user?id={call.from_user.id}'>{clear_firstname(call.from_user.first_name)}</a>\n"
         "🔴 Выключил пополнения в боте.")
 
 
 # Выключение пополнения
-@dp.message_handler(IsPrivate(), IsAdmin(), text="🟢 Включить пополнения")
-async def turn_on_refill(message: types.Message):
+@dp.callback_query_handler(text="🟢 Включить пополнения", state="*")
+async def turn_on_refill(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     await update_paymentx(status="True")
-    await message.answer("<b>🟢 Пополнения в боте были включены.</b>",
+    await message.edit_text("<b>🟢 Пополнения в боте были включены.</b>",
                          reply_markup=await payment_default())
     await send_all_admin(
-        f"👤 Администратор <a href='tg://user?id={message.from_user.id}'>{clear_firstname(message.from_user.first_name)}</a>\n"
+        f"👤 Администратор <a href='tg://user?id={call.from_user.id}'>{clear_firstname(call.from_user.first_name)}</a>\n"
         "🟢 Включил пополнения в боте.")
 
 
@@ -81,16 +85,22 @@ async def input_amount(call: CallbackQuery):
 ###################################################################################
 ####################################### QIWI ######################################
 # Изменение QIWI кошелька
-@dp.message_handler(IsPrivate(), IsAdmin(), text="🥝 Изменить QIWI 🖍")
-async def change_qiwi_login(message: types.Message):
-    await message.answer("<b>🥝 Введите</b> <code>логин(номер)</code> <b>QIWI кошелька🖍 </b>",
-                         reply_markup=payment_back_default)
+@dp.callback_query_handler(text="🥝 Изменить QIWI 🖍", state="*")
+async def change_qiwi_login(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
+    await message.edit_text(
+        "<b>🥝 Введите</b> <code>логин(номер)</code> <b>QIWI кошелька🖍 </b>",
+        reply_markup=payment_back_default
+    )
     await StorageQiwi.here_input_qiwi_login.set()
 
 
 # Проверка работоспособности QIWI
-@dp.message_handler(IsPrivate(), IsAdmin(), text="🥝 Проверить QIWI ♻")
-async def check_qiwi(message: types.Message):
+@dp.callback_query_handler(text="🥝 Проверить QIWI ♻", state="*")
+async def check_qiwi(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     get_payments = await get_paymentx()
     check_pass = True
     if get_payments[0] != "None" or get_payments[1] != "None" or get_payments[2] != "None":
@@ -110,24 +120,26 @@ async def check_qiwi(message: types.Message):
         except json.decoder.JSONDecodeError:
             check_pass = False
         if check_pass:
-            await bot.send_message(message.from_user.id,
+            await bot.send_message(call.from_user.id,
                                    f"<b>🥝 QIWI кошелёк полностью функционирует ✅</b>\n"
                                    f"👤 Логин: <code>{get_payments[0]}</code>\n"
                                    f"♻ Токен: <code>{get_payments[1]}</code>\n"
                                    f"📍 Приватный ключ: <code>{get_payments[2]}</code>")
         else:
-            await bot.send_message(message.from_user.id,
+            await bot.send_message(call.from_user.id,
                                    "<b>🥝 QIWI кошелёк не прошёл проверку ❌</b>\n"
                                    "❗ Как можно быстрее его замените ❗")
     else:
-        await bot.send_message(message.from_user.id,
+        await bot.send_message(call.from_user.id,
                                "<b>🥝 QIWI кошелёк отсутствует ❌</b>\n"
                                "❗ Как можно быстрее его установите ❗")
 
 
 # Обработка кнопки "Баланс Qiwi"
-@dp.message_handler(IsPrivate(), IsAdmin(), text="🥝 Баланс QIWI 👁")
-async def balance_qiwi(message: types.Message):
+@dp.callback_query_handler(text="🥝 Баланс QIWI 👁", state="*")
+async def balance_qiwi(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     get_payments = await get_paymentx()
     if get_payments[0] != "None" or get_payments[1] != "None" or get_payments[2] != "None":
         request = requests.Session()

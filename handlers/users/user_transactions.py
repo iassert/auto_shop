@@ -96,8 +96,12 @@ async def create_crypto_bot_pay(message: types.Message, state: FSMContext):
         amount = pay_amount,
         asset = 'USDT'
     )
-    await Crypto.paid(fiat_invoice.invoice_id, func = refill(message, fiat_invoice))
-    await add_invoice(fiat_invoice.invoice_id)
+    await Crypto.paid(
+        fiat_invoice.invoice_id, 
+        message.from_user.id,
+        message.from_user.username,
+        message.from_user.first_name,
+    )
 
     await bot.delete_message(message.chat.id, del_msg.message_id)
     
@@ -108,29 +112,7 @@ async def create_crypto_bot_pay(message: types.Message, state: FSMContext):
     )
     await state.finish()
 
-def refill(message: types.Message, fiat_invoice: Invoice):
-    user_id = message.from_user.id
-    pay_amount = fiat_invoice.amount
 
-    async def _refill():
-        get_user_info = await get_userx(user_id = user_id)
-        await update_userx(
-            user_id,
-            balance = int(get_user_info[4]) + pay_amount,
-            all_refill = int(get_user_info[5]) + pay_amount
-        )
-        await bot.send_message(user_id,
-            f"<b>✅ Вы успешно пополнили баланс на сумму {pay_amount}$. Удачи ❤</b>\n",
-            reply_markup = check_user_out_func(user_id)
-        )
-        await send_all_admin(f"<b>💰 Пользователь</b> "
-            f"(@{message.from_user.username}|<a href='tg://user?id={message.from_user.id}'>{message.from_user.first_name}</a>"
-            f"|<code>{message.from_user.id}</code>) "
-            f"<b>пополнил баланс на сумму</b> <code>{pay_amount}$</code> 🤖\n"
-            f"📃 <b>invoice id:</b> <code>+{fiat_invoice.invoice_id}</code>")
-        await del_invoice(fiat_invoice.invoice_id)
-
-    return _refill
 
 ###################################################################################
 ####################################### QIWI ######################################

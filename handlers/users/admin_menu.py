@@ -1,10 +1,11 @@
 # - *- coding: utf- 8 - *-
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.types import CallbackQuery
 
 from filters import IsPrivate, IsAdmin
 from keyboards.default import get_settings_func, payment_default, get_functions_func, items_default, admins
-from keyboards.inline import choice_way_input_payment_func
+from keyboards.inline import choice_way_input_payment_func, on_main
 from loader import dp, bot
 from utils.db_api.sqlite import *
 
@@ -15,11 +16,13 @@ def split_messages(get_list, count):
 
 
 # Обработка кнопки "Платежные системы"
-@dp.message_handler(IsPrivate(), IsAdmin(), text="🔑 Платежные системы", state="*")
-async def payments_systems(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text="🔑 Платежные системы", state="*")
+async def payments_systems(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     await state.finish()
-    await message.answer("🔑 Настройка платежных системы.", reply_markup= await payment_default())
-    await message.answer("🥝 Выберите способ пополнения 💵\n"
+    await message.edit_text("🔑 Настройка платежных системы.", reply_markup= await payment_default())
+    await message.edit_text("🥝 Выберите способ пополнения 💵\n"
                          "➖➖➖➖➖➖➖➖➖➖➖➖➖\n"
                          "🔸 <a href='https://vk.cc/bYjKGM'><b>По форме</b></a> - <code>Готовая форма оплаты QIWI</code>\n"
                          "🔸 <a href='https://vk.cc/bYjKEy'><b>По номеру</b></a> - <code>Перевод средств по номеру телефона</code>\n"
@@ -29,37 +32,45 @@ async def payments_systems(message: types.Message, state: FSMContext):
 
 
 # Обработка кнопки "Настройки бота"
-@dp.message_handler(IsPrivate(), IsAdmin(), text="⚙ Настройки", state="*")
-async def settings_bot(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text="⚙ Настройки", state="*")
+async def settings_bot(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     await state.finish()
-    await message.answer("⚙ Основные настройки бота.", reply_markup= await get_settings_func())
+    await message.edit_text("⚙ Основные настройки бота.", reply_markup= await get_settings_func())
 
 
 # Обработка кнопки "Общие функции"
-@dp.message_handler(IsPrivate(), IsAdmin(), text="🔆 Общие функции", state="*")
-async def general_functions(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text="🔆 Общие функции", state="*")
+async def general_functions(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     await state.finish()
-    await message.answer("🔆 Выберите нужную функцию.", reply_markup=get_functions_func(message.from_user.id))
+    await message.edit_text("🔆 Выберите нужную функцию.", reply_markup=get_functions_func(call.from_user.id))
 
 
 # Обработка кнопки "Общие функции"
-@dp.message_handler(IsPrivate(), IsAdmin(), text="📰 Информация о боте", state="*")
-async def general_functions(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text="📰 Информация о боте", state="*")
+async def general_functions(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     await state.finish()
     about_bot = await get_about_bot()
-    await message.answer(about_bot)
+    await message.edit_text(about_bot, reply_markup=on_main)
 
 
 # Обработка кнопки "Управление товарами"
-@dp.message_handler(IsPrivate(), IsAdmin(), text="🎁 Управление товарами 🖍", state="*")
-async def general_functions(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(text="🎁 Управление товарами 🖍", state="*")
+async def general_functions(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
     await state.finish()
-    await message.answer("🎁 Редактирование товаров, разделов и категорий 📜",
+    await message.edit_text("🎁 Редактирование товаров, разделов и категорий 📜",
                          reply_markup=items_default)
 
 
 # Получение БД
-@dp.message_handler(IsPrivate(), IsAdmin(), text="/getbd", state="*")
+@dp.message_handler(IsPrivate(), IsAdmin(), commands="getbd", state="*")
 async def general_functions(message: types.Message, state: FSMContext):
     await state.finish()
     for admin in admins:
@@ -110,7 +121,7 @@ async def get_about_bot():
 
 
 # Получение списка всех товаров
-@dp.message_handler(IsPrivate(), IsAdmin(), text="/getitems", state="*")
+@dp.message_handler(IsPrivate(), IsAdmin(), commands="getitems", state="*")
 async def get_chat_id(message: types.Message, state: FSMContext):
     await state.finish()
     save_items = []
@@ -140,7 +151,7 @@ async def get_chat_id(message: types.Message, state: FSMContext):
 
 
 # Получение списка всех позиций
-@dp.message_handler(IsPrivate(), IsAdmin(), text="/getposition", state="*")
+@dp.message_handler(IsPrivate(), IsAdmin(), commands="getposition", state="*")
 async def get_chat_id(message: types.Message, state: FSMContext):
     await state.finish()
     save_items = []
@@ -167,7 +178,7 @@ async def get_chat_id(message: types.Message, state: FSMContext):
 
 
 # Получение подробного списка всех товаров
-@dp.message_handler(IsPrivate(), IsAdmin(), text="/getinfoitems", state="*")
+@dp.message_handler(IsPrivate(), IsAdmin(), commands="getinfoitems", state="*")
 async def get_chat_id(message: types.Message, state: FSMContext):
     await state.finish()
     save_items = []
