@@ -3,6 +3,8 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from ..default.builder import InlineKeyboardBuilder
 
+from loader import bot
+
 # Проверка оплаты битка
 def create_pay_qiwi_func(send_requests, receipt, message_id, way):
     check_qiwi_pay_inl = InlineKeyboardBuilder()
@@ -16,12 +18,29 @@ def create_pay_qiwi_func(send_requests, receipt, message_id, way):
 # Кнопки при открытии самого товара
 def open_item_func(position_id, remover, category_id):
     open_item = InlineKeyboardMarkup()
-    open_item.add(InlineKeyboardButton(text="💰 Купить товар",
-                                       callback_data=f"buy_this_item:{position_id}"))
-    open_item.add(InlineKeyboardButton("⬅ Вернуться ↩",
-                                       callback_data=f"back_buy_item_position:{remover}:{category_id}"))
+    open_item.add(InlineKeyboardButton(
+        text="💰 Купить товар",
+        callback_data=f"buy_this_item:{position_id}"
+    ))
+    open_item.add(InlineKeyboardButton(
+        text="⬅ Вернуться ↩",
+        callback_data=f"back_buy_item_position:{remover}:{category_id}"
+    ))
     return open_item
 
+def sell_item_func(
+    sPosition_id: str, 
+    sRemover: str, 
+    sCategory_id: str, 
+    username: str
+):
+    open_item = InlineKeyboardMarkup()
+    open_item.add(InlineKeyboardButton(
+        text="💰 Купить товар",
+        url=f"https://t.me/{username}?start={sPosition_id}_{sRemover}_{sCategory_id}"
+    ))
+
+    return open_item
 
 # Подтверждение покупки товара
 def confirm_buy_items(position_id, get_count, message_id):

@@ -12,7 +12,6 @@ async def payment_default():
         payment_kb.row("🔴 Выключить пополнения")
     else:
         payment_kb.row("🟢 Включить пополнения")
-    payment_kb.row("⬅ На главную")
     return payment_kb
 
 

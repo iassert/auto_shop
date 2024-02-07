@@ -20,6 +20,6 @@ if not ctypro_bot_token:
 
 
 bot_version = "2.3"
-bot_description = f"<b>♻ Bot created by @PAINONL</b>\n" \
+bot_description = f"<b>♻ Bot created by @static_assert</b>\n" \
                   f"<b>⚜ Bot Version:</b> <code>{bot_version}</code>\n" \
-                  f"<b>🍩 Donate to the author:</b> <a href='https://www.donationalerts.com/r/painscream'><b>Click me</b></a>"
+                  f"<b>🍩 Donate to the author:</b> <a href='https://t.me/send?start=IVTFNZEEFaFx'><b>Click me</b></a>"

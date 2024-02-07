@@ -439,6 +439,84 @@ async def get_purchasesx(what_select, **kwargs):
     return get_response
 
 
+async def get_storage_promocod(name: str):
+    async with aiosqlite.connect(path_to_db) as db:
+        get_response = await db.execute(
+            "SELECT procent, count_use FROM storage_promocod WHERE name = ?;",
+            [name]
+        )
+        get_response = await get_response.fetchall()
+    return get_response
+
+async def add_storage_promocod(name: str, procent: int, count_use: int):
+    async with aiosqlite.connect(path_to_db) as db:
+        await db.execute(
+            "INSERT INTO storage_promocod "
+            "(name, procent, count_use)"
+            "VALUES (?, ?, ?)",
+            [name, procent, count_use]
+        )
+        await db.commit()
+
+
+async def get_user_promocod(user_id: str, name_promo: str):
+    async with aiosqlite.connect(path_to_db) as db:
+        get_response = await db.execute(
+            "SELECT * FROM user_promocod WHERE user_id = ? and name = ?;",
+            [user_id, name_promo]
+        )
+        get_response = await get_response.fetchall()
+    return get_response
+
+async def get_count_use(name: str):
+    async with aiosqlite.connect(path_to_db) as db:
+        get_response = await db.execute(
+            "SELECT COUNT(user_id) FROM user_promocod WHERE name = ?;",
+            [name]
+        )
+        get_response = await get_response.fetchone()
+    return get_response[0] if get_response else 0
+
+async def get_count_procent(user_id: int) -> int:
+    async with aiosqlite.connect(path_to_db) as db:
+        get_response = await db.execute(
+            "SELECT SUM(procent) "
+            "FROM user_promocod "
+            "JOIN storage_promocod "
+            "ON storage_promocod.name = user_promocod.name "
+            "WHERE user_id = ? AND use = 0;",
+            [user_id]
+        )
+        get_response = await get_response.fetchone()
+    
+    if not get_response:
+        return 0
+    
+    count_procent = get_response[0]
+    if not count_procent:
+        return 0
+
+    if count_procent >= 90:
+        return 90
+    return count_procent
+
+async def update_procent(user_id: int) -> int:
+    async with aiosqlite.connect(path_to_db) as db:
+        await db.execute(f"UPDATE user_promocod SET use = 1 WHERE user_id = ?;", [user_id])
+        await db.commit()
+
+
+async def add_user_promocod(name: str, user_id: int, use: bool):
+    async with aiosqlite.connect(path_to_db) as db:
+        await db.execute(
+            "INSERT INTO user_promocod "
+            "(name, user_id, use)"
+            "VALUES (?, ?, ?)",
+            [name, user_id, use]
+        )
+        await db.commit()
+
+
 # Получение всех покупок
 async def get_all_purchasesx():
     async with aiosqlite.connect(path_to_db) as db:
@@ -453,6 +531,7 @@ async def get_all_invoice():
         get_response = await db.execute(sql)
         get_response = await get_response.fetchall()
     return get_response
+
 
 async def add_invoice(
     invoice_id: int, 
@@ -642,4 +721,42 @@ async def create_bdx():
                 ")"
             )
             print("DB was not found(9/9) | Creating...")
+
+        # Создание БД с storage_promocod
+        check_sql = await db.execute("PRAGMA table_info(storage_promocod)")
+        check_sql = await check_sql.fetchall()
+        check_create_purchases = [c for c in check_sql]
+        if len(check_create_purchases) == 3:
+            print("DB was found(10/10)")
+        else:
+            await db.execute(
+                "CREATE TABLE storage_promocod("
+                    "name TEXT PRIMARY KEY,"
+                    "procent   INTEGER,"
+                    "count_use INTEGER"
+                ")"
+            )
+            print("DB was not found(10/10) | Creating...")
+    
+        # Создание БД с user_promocod
+        check_sql = await db.execute("PRAGMA table_info(user_promocod)")
+        check_sql = await check_sql.fetchall()
+        check_create_purchases = [c for c in check_sql]
+
+        if len(check_create_purchases) == 1:
+            await db.execute("DROP TABLE user_promocod;")
+            await db.commit()
+            print("DB user_promocod drop(11/11)")
+
+        if len(check_create_purchases) == 3:
+            print("DB was found(11/11)")
+        else:
+            await db.execute(
+                "CREATE TABLE user_promocod("
+                    "name    TEXT,"
+                    "user_id INTEGER,"
+                    "use     BOOLEAN"
+                ")"
+            )
+            print("DB was not found(11/11) | Creating...")
         await db.commit()

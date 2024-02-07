@@ -45,13 +45,13 @@ async def send_all_admin(message, markup=None):
     if markup is None:
         for admin in admins:
             try:
-                await bot.send_message(admin, message)
+                await bot.send_message(admin, message, disable_web_page_preview=True)
             except:
                 pass
     else:
         for admin in admins:
             try:
-                await bot.send_message(admin, message, reply_markup=markup)
+                await bot.send_message(admin, message, reply_markup=markup, disable_web_page_preview=True)
             except:
                 pass
 

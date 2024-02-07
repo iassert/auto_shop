@@ -23,7 +23,7 @@ async def on_startup(dp):
     await create_bdx()
     await update_profit()
 
-    ex = Executor(ctypro_bot_token, Networks.TEST_NET)
+    ex = Executor(ctypro_bot_token)#, Networks.TEST_NET)
     ex.start_polling()
 
     print("~~~~~ Bot was started ~~~~~")

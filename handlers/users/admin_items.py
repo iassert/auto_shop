@@ -186,6 +186,37 @@ async def category_remove_all(call: CallbackQuery, state: FSMContext):
                          reply_markup=confirm_clear_category_inl)
 
 
+@dp.callback_query_handler(text="💠 Добавить промокод", state="*")
+async def add_promo(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
+    await message.edit_text("💠<b>Введите промокод в формате</b>:\n{название} | {процент} | {количество}", reply_markup=on_main)
+    await StorageItems.add_promo.set()
+
+
+@dp.message_handler(content_types="text", state=StorageItems.add_promo)
+async def write_add_promo(message: types.Message, state: FSMContext):
+    data = message.text.split('|')
+
+    if len(data) != 3:
+        return await message.answer("⚠️ Не верный формат")
+
+    name_promo, procent, conunt_use = data
+    if not procent.isdigit():
+        return await message.answer("⚠️ Процент, должен быть целым числом")
+    
+    if not conunt_use.isdigit():
+        return await message.answer("⚠️ Количество использование, должен быть целым числом")
+    
+    row = await get_storage_promocod(name_promo)
+    if row:
+        return await message.answer("⚠️ Такой промокод уже есть")
+
+    await add_storage_promocod(name_promo, procent, conunt_use)
+    await message.answer(f"✅ Промокод '{name_promo}' - {procent}% | {conunt_use} создан")
+
+    await state.finish()
+
 # Согласие на удаление всех категорий (позиций и товаров включительно)
 @dp.callback_query_handler(text_startswith="confirm_clear_category", state="*")
 async def category_remove_all_confirm(call: CallbackQuery, state: FSMContext):

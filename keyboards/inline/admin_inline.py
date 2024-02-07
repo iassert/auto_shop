@@ -28,3 +28,9 @@ confirm_clear_item_inl.add(yes_clear_item_kb, not_clear_item_kb)
 # Удаление товара
 delete_item_inl = InlineKeyboardMarkup()
 delete_item_inl.add(InlineKeyboardButton(text="🎁 Удалить товар", callback_data="delete_this_item"))
+
+def reply_support(user_id: int) -> InlineKeyboardMarkup:
+    reply_support = InlineKeyboardMarkup()
+    reply_support.add(InlineKeyboardButton(text="📨 Ответить", callback_data=f"reply_support:{user_id}"))
+
+    return reply_support

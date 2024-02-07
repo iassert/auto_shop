@@ -275,7 +275,6 @@ async def position_open_edit_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_to_category"))
-    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -304,7 +303,6 @@ async def position_edit_next_page_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_to_category"))
-    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -333,7 +331,6 @@ async def position_edit_previous_page_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_to_category"))
-    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -457,7 +454,6 @@ async def position_add_item_position_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_to_category_add_item"))
-    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -486,7 +482,6 @@ async def position_edit_next_page_position_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_to_category_add_item"))
-    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -515,7 +510,6 @@ async def position_edit_previous_page_position_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_to_category_add_item"))
-    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -608,15 +602,26 @@ async def buy_item_previous_page_category_ap(remover):
 
 ########################################### ПОЗИЦИИ ##########################################
 # Стартовые страницы позиций для покупки товаров
-async def buy_item_item_position_ap(remover, category_id):
+async def buy_item_item_position_ap(remover, category_id, user_id):
+    count_procent = await get_count_procent(user_id=user_id)
+
     x = 0
     keyboard = InlineKeyboardBuilder()
     get_positions = await get_positionsx("*", category_id=category_id)
     for a in range(remover, len(get_positions)):
         if x < count_page:
             get_items = await get_itemsx("*", position_id=get_positions[a][1])
-            keyboard.add(InlineKeyboardButton(f"{get_positions[a][2]} | {get_positions[a][3]}$ | {len(get_items)}шт",
-                                              callback_data=f"buy_open_position:{get_positions[a][1]}:{remover}:{category_id}"))
+            cost = int(get_positions[a][3])
+
+            if count_procent > 0:
+                new_cost = round(cost - (count_procent / 100) * cost, 2)
+                if new_cost > 1:
+                    cost = new_cost
+
+            keyboard.add(InlineKeyboardButton(
+                f"{get_positions[a][2]} | {cost}$ | {len(get_items)}шт",
+                callback_data=f"buy_open_position:{get_positions[a][1]}:{remover}:{category_id}"
+            ))
         x += 1
     if len(get_positions) <= 10:
         pass
@@ -639,7 +644,6 @@ async def buy_item_item_position_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_buy_item_to_category"))
-    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -668,7 +672,6 @@ async def item_buy_next_page_position_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_buy_item_to_category"))
-    keyboard.row("⬅ На главную")
     return keyboard
 
 
@@ -697,5 +700,4 @@ async def item_buy_previous_page_position_ap(remover, category_id):
         keyboard.add(prev_kb, nomer_kb, next_kb)
     keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩",
                                       callback_data=f"back_buy_item_to_category"))
-    keyboard.row("⬅ На главную")
     return keyboard

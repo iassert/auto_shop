@@ -32,6 +32,16 @@ async def send_ad_all_users(call: CallbackQuery, state: FSMContext):
     )
     await StorageFunctions.here_ad_text.set()
 
+@dp.callback_query_handler(text="📸 Изменить фото", state="*")
+async def change_photo(call: CallbackQuery, state: FSMContext):
+    message: types.Message = call.message
+
+    await message.edit_text(
+        "<b>📸 Отправтье фото:</b>",
+        reply_markup=functions_back_default
+    )
+    await StorageFunctions.change_photo.set()
+
 
 # Обработка кнопки "Поиск профиля"
 @dp.callback_query_handler(text="📱 Поиск профиля 🔍", state="*")
@@ -69,6 +79,18 @@ async def input_text_for_ad(message: types.Message, state: FSMContext):
                                                  f"▶ <code>{message.text}</code>\n"
                                                  f"👤 <code>{len(users)}</code> пользователям?",
                            reply_markup=sure_send_ad_inl)
+    
+# Принятие текста для рассылки
+@dp.message_handler(IsPrivate(), IsAdmin(), content_types="photo", state=StorageFunctions.change_photo)
+async def input_text_for_ad(message: types.Message, state: FSMContext):
+    photo_id = message.photo[-1].file_id
+    photo = await bot.get_file(photo_id)
+    await photo.download(
+        destination_dir  = './photo/',
+        destination_file = 'main_menu.jpg'
+    )
+
+    await message.answer("Фото измененно")
 
 
 # Обработка колбэка отправки рассылки

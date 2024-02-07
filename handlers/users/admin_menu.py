@@ -20,9 +20,14 @@ def split_messages(get_list, count):
 async def payments_systems(call: CallbackQuery, state: FSMContext):
     message: types.Message = call.message
 
+    try:
+        await message.delete()
+    except:
+        ...
+    
     await state.finish()
-    await message.edit_text("🔑 Настройка платежных системы.", reply_markup= await payment_default())
-    await message.edit_text("🥝 Выберите способ пополнения 💵\n"
+    await message.answer("🔑 Настройка платежных системы.", reply_markup= await payment_default())
+    await message.answer("🥝 Выберите способ пополнения 💵\n"
                          "➖➖➖➖➖➖➖➖➖➖➖➖➖\n"
                          "🔸 <a href='https://vk.cc/bYjKGM'><b>По форме</b></a> - <code>Готовая форма оплаты QIWI</code>\n"
                          "🔸 <a href='https://vk.cc/bYjKEy'><b>По номеру</b></a> - <code>Перевод средств по номеру телефона</code>\n"
@@ -36,8 +41,13 @@ async def payments_systems(call: CallbackQuery, state: FSMContext):
 async def settings_bot(call: CallbackQuery, state: FSMContext):
     message: types.Message = call.message
 
+    try:
+        await message.delete()
+    except:
+        ...
+
     await state.finish()
-    await message.edit_text("⚙ Основные настройки бота.", reply_markup= await get_settings_func())
+    await message.answer("⚙ Основные настройки бота.", reply_markup= await get_settings_func())
 
 
 # Обработка кнопки "Общие функции"
@@ -45,8 +55,13 @@ async def settings_bot(call: CallbackQuery, state: FSMContext):
 async def general_functions(call: CallbackQuery, state: FSMContext):
     message: types.Message = call.message
 
+    try:
+        await message.delete()
+    except:
+        ...
+
     await state.finish()
-    await message.edit_text("🔆 Выберите нужную функцию.", reply_markup=get_functions_func(call.from_user.id))
+    await message.answer("🔆 Выберите нужную функцию.", reply_markup=get_functions_func(call.from_user.id))
 
 
 # Обработка кнопки "Общие функции"
@@ -54,9 +69,14 @@ async def general_functions(call: CallbackQuery, state: FSMContext):
 async def general_functions(call: CallbackQuery, state: FSMContext):
     message: types.Message = call.message
 
+    try:
+        await message.delete()
+    except:
+        ...
+
     await state.finish()
     about_bot = await get_about_bot()
-    await message.edit_text(about_bot, reply_markup=on_main)
+    await message.answer(about_bot, reply_markup=on_main)
 
 
 # Обработка кнопки "Управление товарами"
@@ -64,9 +84,16 @@ async def general_functions(call: CallbackQuery, state: FSMContext):
 async def general_functions(call: CallbackQuery, state: FSMContext):
     message: types.Message = call.message
 
+    try:
+        await message.delete()
+    except:
+        ...
+
     await state.finish()
-    await message.edit_text("🎁 Редактирование товаров, разделов и категорий 📜",
-                         reply_markup=items_default)
+    await message.answer(
+        "🎁 Редактирование товаров, разделов и категорий 📜",
+                         reply_markup=items_default
+            )
 
 
 # Получение БД
@@ -91,15 +118,15 @@ async def get_about_bot():
     show_positions = await get_all_positionsx()
     show_items = await get_all_itemsx()
     for purchase in all_purchases:
-        show_profit_all += int(purchase[6])
-        if int(get_settings[4]) - int(purchase[14]) < 86400:
-            show_profit_day += int(purchase[6])
+        show_profit_all += float(purchase[6])
+        if float(get_settings[4]) - float(purchase[14]) < 86400:
+            show_profit_day += float(purchase[6])
     for user in all_users:
-        show_money_in_bot += int(user[4])
+        show_money_in_bot += float(user[4])
     for refill in all_refill:
-        show_refill += int(refill[5])
-        if int(get_settings[5]) - int(refill[9]) < 86400:
-            show_buy_day += int(refill[5])
+        show_refill += float(refill[5])
+        if float(get_settings[5]) - float(refill[9]) < 86400:
+            show_buy_day += float(refill[5])
     message = "<b>📰 ВСЯ ИНФОРАМЦИЯ О БОТЕ</b>\n" \
               f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
               f"<b>🔶 Пользователи:</b> 🔶\n" \

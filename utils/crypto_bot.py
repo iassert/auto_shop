@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from loader import bot
 from utils  import send_all_admin
@@ -73,12 +74,17 @@ class Executor:
             if not Executor.invoices:
                 await Executor.event.wait()
                 Executor.event = Event()
-
-            invoices = await Executor.crypto.get_invoices(
-                invoice_ids = [
-                    *Executor.invoices.keys()
-                ]
-            )
+            
+            try:
+                invoices = await Executor.crypto.get_invoices(
+                    invoice_ids = [
+                        *Executor.invoices.keys()
+                    ]
+                )
+            except BaseException as ex:
+                logging.error(f"{ex.__class__.__name__}: {ex}")
+                await asyncio.sleep(Executor.defult_delay)
+                continue
 
             for invoice in invoices:
                 if invoice.status == "paid" and invoice.invoice_id in Executor.invoices:

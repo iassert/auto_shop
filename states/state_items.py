@@ -32,3 +32,5 @@ class StorageItems(StatesGroup):
 
     here_del_items = State()
     here_add_items = State()
+
+    add_promo = State()

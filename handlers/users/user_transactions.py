@@ -26,7 +26,14 @@ from utils.db_api.sqlite import update_userx, get_refillx, add_refillx, add_invo
 
 @dp.callback_query_handler(text="user_input")
 async def input_amount(call: CallbackQuery):
-    await call.message.answer(
+    message: types.Message = call.message
+
+    try:
+        await message.delete()
+    except:
+        ...
+
+    await message.answer(
         "<b>Введите сумму для пополнения средств 🤖</b>",
         "html",
         reply_markup = all_back_to_main_default
